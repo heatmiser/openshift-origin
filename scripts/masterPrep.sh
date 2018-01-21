@@ -1,9 +1,19 @@
 #!/bin/bash
 echo $(date) " - Starting Script"
 
-STORAGEACCOUNT=$1
-SUDOUSER=$2
-LOCATION=$3
+set -e
+
+curruser=$(ps -o user= -p $$ | awk '{print $1}')
+echo "Executing script as user: $curruser"
+echo "args: $*"
+
+export STORAGEACCOUNT=$1
+export SUDOUSER=$2
+export LOCATION=$3
+
+# Provide current variables if needed for troubleshooting
+#set -o posix ; set
+echo "Command line args: $@"
 
 # Install EPEL repository
 echo $(date) " - Installing EPEL"

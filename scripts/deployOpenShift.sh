@@ -4,6 +4,10 @@ echo $(date) " - Starting Script"
 
 set -e
 
+curruser=$(ps -o user= -p $$ | awk '{print $1}')
+echo "Executing script as user: $curruser"
+echo "args: $*"
+
 export SUDOUSER=$1
 export PASSWORD="$2"
 export PRIVATEKEY=$3
@@ -37,6 +41,10 @@ export CLOUD=${CLOUD^^}
 export MASTERLOOP=$((MASTERCOUNT - 1))
 export INFRALOOP=$((INFRACOUNT - 1))
 export NODELOOP=$((NODECOUNT - 1))
+
+# Provide current variables if needed for troubleshooting
+#set -o posix ; set
+echo "Command line args: $@"
 
 # Generate private keys for use by Ansible
 echo $(date) " - Generating Private keys for use by Ansible for OpenShift Installation"
