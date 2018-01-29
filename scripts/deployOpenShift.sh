@@ -99,11 +99,11 @@ cat > /home/${SUDOUSER}/addocpuser.yml <<EOF
     shell: "htpasswd -cb /etc/origin/master/htpasswd {{ lookup('env','SUDOUSER') }} \"{{ lookup('env','PASSWORD') }}\""
 EOF
 
-# Run on MASTER-0 - Make initial OpenShift User a Cluster Admin
+# Run on MASTER-000 - Make initial OpenShift User a Cluster Admin
 
 cat > /home/${SUDOUSER}/assignclusteradminrights.yml <<EOF
 ---
-- hosts: master0
+- hosts: master000
   gather_facts: no
   become: yes
   become_method: sudo
@@ -129,7 +129,7 @@ cat > /home/${SUDOUSER}/assignrootpassword.yml <<EOF
     shell: echo \"{{ lookup('env','PASSWORD') }}\"|passwd root --stdin
 EOF
 
-# Run on MASTER-0 node - configure registry to use Azure Storage
+# Run on MASTER-000 node - configure registry to use Azure Storage
 # Create docker registry config based on Commercial Azure or Azure Government
 
 if [[ $CLOUD == "US" ]]
@@ -137,7 +137,7 @@ then
 
 cat > /home/${SUDOUSER}/dockerregistry.yml <<EOF
 ---
-- hosts: master0
+- hosts: master000
   gather_facts: no
   become: yes
   become_method: sudo
@@ -152,7 +152,7 @@ else
 
 cat > /home/${SUDOUSER}/dockerregistry.yml <<EOF
 ---
-- hosts: master0
+- hosts: master000
   gather_facts: no
   become: yes
   become_method: sudo
@@ -165,11 +165,11 @@ EOF
 
 fi
 
-# Run on MASTER-0 - configure Storage Class
+# Run on MASTER-000 - configure Storage Class
 
 cat > /home/${SUDOUSER}/configurestorageclass.yml <<EOF
 ---
-- hosts: master0
+- hosts: master000
   gather_facts: no
   become: yes
   become_method: sudo
@@ -415,7 +415,7 @@ cat > /etc/ansible/hosts <<EOF
 masters
 nodes
 etcd
-master0
+master000
 new_nodes
 
 # Set variables common for all OSEv3 hosts
@@ -479,14 +479,14 @@ openshift_logging_master_public_url=https://$MASTERPUBLICIPHOSTNAME:8443
 
 # host group for masters
 [masters]
-$MASTER-[0:${MASTERLOOP}]
+$MASTER-[000:${MASTERLOOP}]
 
 # host group for etcd
 [etcd]
-$MASTER-[0:${MASTERLOOP}]
+$MASTER-[000:${MASTERLOOP}]
 
-[master0]
-$MASTER-0
+[master000]
+$MASTER-000
 
 # host group for nodes
 [nodes]
@@ -496,21 +496,24 @@ EOF
 
 for (( c=0; c<$MASTERCOUNT; c++ ))
 do
-  echo "$MASTER-$c openshift_node_labels=\"{'type': 'master', 'zone': 'default'}\" openshift_hostname=$MASTER-$c" >> /etc/ansible/hosts
+  printf -v hostnum "%03d" $c
+  echo "$MASTER-$hostnum openshift_node_labels=\"{'type': 'master', 'zone': 'default'}\" openshift_hostname=$MASTER-$hostnum" >> /etc/ansible/hosts
 done
 
 # Loop to add Infra Nodes
 
 for (( c=0; c<$INFRACOUNT; c++ ))
 do
-  echo "$INFRA-$c openshift_node_labels=\"{'type': 'infra', 'zone': 'default'}\" openshift_hostname=$INFRA-$c" >> /etc/ansible/hosts
+  printf -v hostnum "%03d" $c
+  echo "$INFRA-$hostnum openshift_node_labels=\"{'type': 'infra', 'zone': 'default'}\" openshift_hostname=$INFRA-$hostnum" >> /etc/ansible/hosts
 done
 
 # Loop to add Nodes
 
 for (( c=0; c<$NODECOUNT; c++ ))
 do
-  echo "$NODE-$c openshift_node_labels=\"{'type': 'app', 'zone': 'default'}\" openshift_hostname=$NODE-$c" >> /etc/ansible/hosts
+  printf -v hostnum "%03d" $c
+  echo "$NODE-$hostnum openshift_node_labels=\"{'type': 'app', 'zone': 'default'}\" openshift_hostname=$NODE-$hostnum" >> /etc/ansible/hosts
 done
 
 # Create new_nodes group
