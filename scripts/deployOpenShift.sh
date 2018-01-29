@@ -38,9 +38,12 @@ export STORAGEKIND=${25}
 CLOUD=$( curl -H Metadata:true "http://169.254.169.254/metadata/instance/compute/location?api-version=2017-04-02&format=text" | cut -c 1-2 )
 export CLOUD=${CLOUD^^}
 
-export MASTERLOOP=$((MASTERCOUNT - 1))
-export INFRALOOP=$((INFRACOUNT - 1))
-export NODELOOP=$((NODECOUNT - 1))
+printf -v MASTERLOOP "%03d" $((MASTERCOUNT - 1))
+export MASTERLOOP
+printf -v INFRALOOP "%03d" $((INFRACOUNT - 1))
+export INFRALOOP
+printf -v NODELOOP "%03d" $((NODECOUNT - 1))
+export NODELOOP
 
 # Provide current variables if needed for troubleshooting
 #set -o posix ; set
