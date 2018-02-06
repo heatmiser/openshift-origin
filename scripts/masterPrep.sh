@@ -1,9 +1,19 @@
 #!/bin/bash
 echo $(date) " - Starting Script"
 
-STORAGEACCOUNT=$1
-SUDOUSER=$2
-LOCATION=$3
+set -e
+
+curruser=$(ps -o user= -p $$ | awk '{print $1}')
+echo "Executing script as user: $curruser"
+echo "args: $*"
+
+export STORAGEACCOUNT=$1
+export SUDOUSER=$2
+export LOCATION=$3
+
+# Provide current variables if needed for troubleshooting
+#set -o posix ; set
+echo "Command line args: $@"
 
 if yum list installed | grep epel | grep 7; then
     echo $(date) " - EPEL 7 already in place, skipping initial install"
@@ -26,7 +36,7 @@ yum -y update --exclude=WALinuxAgent
 # Only install Ansible and pyOpenSSL on Master-0 Node
 # python-passlib needed for metrics
 
-if hostname -f|grep -- "-0" >/dev/null
+if hostname -f|grep -- "-000" >/dev/null
 then
    echo $(date) " - Installing Ansible, pyOpenSSL and python-passlib"
    yum -y --enablerepo=epel install ansible pyOpenSSL python-passlib
