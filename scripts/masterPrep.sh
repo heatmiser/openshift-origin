@@ -33,10 +33,11 @@ yum -y install wget git net-tools bind-utils iptables-services bridge-utils bash
 yum -y install cloud-utils-growpart.noarch
 yum -y update --exclude=WALinuxAgent
 
-# Only install Ansible and pyOpenSSL on Master-0 Node
+# Only install Ansible and pyOpenSSL on Master-000 Node
+# ...or bastion if used.
 # python-passlib needed for metrics
 
-if hostname -f|grep -- "-000" >/dev/null
+if hostname -f|grep -e "-000" -e "bastion" >/dev/null
 then
    echo $(date) " - Installing Ansible, pyOpenSSL and python-passlib"
    yum -y --enablerepo=epel install ansible pyOpenSSL python-passlib
@@ -86,9 +87,9 @@ fi
 systemctl enable docker
 systemctl start docker
 
-# Create Storage Class yml files on MASTER-0
+# Create Storage Class yml files on MASTER-000
 
-if hostname -f|grep -- "-0" >/dev/null
+if hostname -f|grep -- "-000" >/dev/null
 then
 cat <<EOF > /home/${SUDOUSER}/scunmanaged.yml
 kind: StorageClass
