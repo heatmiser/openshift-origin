@@ -5,12 +5,16 @@ STORAGEACCOUNT=$1
 SUDOUSER=$2
 LOCATION=$3
 
-# Install EPEL repository
-echo $(date) " - Installing EPEL"
+if yum list installed | grep epel | grep 7; then
+    echo $(date) " - EPEL 7 already in place, skipping initial install"
+else
+    # Install EPEL repository
+    echo $(date) " - Installing EPEL"
 
-yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 
-sed -i -e "s/^enabled=1/enabled=0/" /etc/yum.repos.d/epel.repo
+    sed -i -e "s/^enabled=1/enabled=0/" /etc/yum.repos.d/epel.repo
+fi
 
 # Update system to latest packages and install dependencies
 echo $(date) " - Update system to latest packages and install dependencies"
