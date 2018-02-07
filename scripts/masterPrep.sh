@@ -33,29 +33,26 @@ yum -y install wget git net-tools bind-utils iptables-services bridge-utils bash
 yum -y install cloud-utils-growpart.noarch
 yum -y update --exclude=WALinuxAgent
 
-# Only install Ansible and pyOpenSSL on Master-000 Node
 # python-passlib needed for metrics
 
-if hostname -f|grep -e "-000" >/dev/null
+if hostname -f|grep -e "master" >/dev/null
 then
-   echo $(date) " - Installing Ansible, pyOpenSSL and python-passlib"
-   yum -y --enablerepo=epel install ansible pyOpenSSL python-passlib
+   echo $(date) " - Installing pyOpenSSL and python-passlib"
+   yum -y --enablerepo=epel install pyOpenSSL python-passlib
+   # Install java to support metrics
+   echo $(date) " - Installing Java"
+   yum -y install java-1.8.0-openjdk-headless
 fi
+
+# Only install Ansible and pyOpenSSL on bastion
+# python-passlib needed for metrics
 
 if hostname -f|grep -e "bastion" >/dev/null
 then
-   echo $(date) " - Installing atomic-openshift-utils on bastion"
    echo $(date) " - Installing Ansible, pyOpenSSL and python-passlib"
-   wget https://raw.githubusercontent.com/openshift/openshift-ansible/master/roles/openshift_repos/templates/CentOS-OpenShift-Origin37.repo.j2 -O /etc/yum.repos.d/CentOS-OpenShift-Origin37.repo
-   wget https://raw.githubusercontent.com/openshift/openshift-ansible/master/roles/openshift_repos/files/origin/gpg_keys/openshift-ansible-CentOS-SIG-PaaS -O /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-PaaS
-   sed -i 's/enabled={.*/enabled=0/g' /etc/yum.repos.d/CentOS-OpenShift-Origin37.repo
-   yum -y install atomic-openshift-utils ansible pyOpenSSL python-passlib
+   yum -y install ansible pyOpenSSL python-passlib
 fi
 
-# Install java to support metrics
-echo $(date) " - Installing Java"
-
-yum -y install java-1.8.0-openjdk-headless
 
 # Grow Root File System
 echo $(date) " - Grow Root FS"
