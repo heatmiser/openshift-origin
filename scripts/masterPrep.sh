@@ -43,6 +43,16 @@ then
    yum -y --enablerepo=epel install ansible pyOpenSSL python-passlib
 fi
 
+if hostname -f|grep -e "bastion" >/dev/null
+then
+   echo $(date) " - Installing atomic-openshift-utils on bastion"
+   cp /home/$SUDOUSER/openshift-ansible/roles/openshift_repos/templates/CentOS-OpenShift-Origin37.repo.j2 /etc/yum.repos.d/
+   mv /etc/yum.repos.d/CentOS-OpenShift-Origin37.repo.j2 /etc/yum.repos.d/CentOS-OpenShift-Origin37.repo
+   cp /home/$SUDOUSER/openshift-ansible/roles/openshift_repos/files/origin/gpg_keys/openshift-ansible-CentOS-SIG-PaaS /etc/pki/rpm-gpg/
+   sed -i 's/enabled={.*/enabled=0/g' /etc/yum.repos.d/CentOS-OpenShift-Origin37.repo
+   yum -y install atomic-openshift-utils
+fi
+
 # Install java to support metrics
 echo $(date) " - Installing Java"
 
