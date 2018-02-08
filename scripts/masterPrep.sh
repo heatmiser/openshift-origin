@@ -51,6 +51,9 @@ if hostname -f|grep -e "bastion" >/dev/null
 then
    echo $(date) " - Installing Ansible, pyOpenSSL and python-passlib"
    yum -y install ansible pyOpenSSL python-passlib
+   # Install java because the keytool check for master instance in openshift-ansible assumes local
+   echo $(date) " - Installing Java"
+   yum -y install java-1.8.0-openjdk-headless
 fi
 
 
